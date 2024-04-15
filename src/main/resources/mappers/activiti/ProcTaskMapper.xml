@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 绑定namespace -->
+<mapper namespace="com.sinosoft.mapper.ProcTaskMapper">
+
+    <resultMap type="com.xazhao.dto.ProcTaskDTO" id="ComProcTaskMap">
+        <result property="id" column="id"/>
+        <result property="taskModule" column="task_module"/>
+        <result property="taskNode" column="task_node"/>
+        <result property="taskNodeId" column="task_node_id"/>
+        <result property="approvalChain" column="approval_chain"/>
+        <result property="taskType" column="task_type"/>
+        <result property="currentTaskUser" column="current_task_user"/>
+        <result property="procInsId" column="proc_ins_id"/>
+        <result property="taskId" column="task_id"/>
+        <result property="operatorCode" column="operator_code"/>
+        <result property="isFinishTask" column="is_finish_task"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="gmtModified" column="gmt_modified"/>
+    </resultMap>
+
+    <!-- sql片段 -->
+    <sql id="selectComProcTaskVo">
+        pt.id, pt.task_module, pt.task_node, pt.task_node_id, pt.approval_chain, pt.task_type, pt.current_task_user, pt.proc_ins_id, pt.task_id, pt.operator_code, pt.is_finish_task, pt.gmt_create, pt.gmt_modified
+    </sql>
+
+    <insert id="insertProcTask" parameterType="com.xazhao.entity.ProcTask">
+        insert into act_proc_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="_databaseId == 'oracle'">id,</if>
+            <if test="task.taskModule != null and task.taskModule != ''">task_module,</if>
+            <if test="task.taskNode != null and task.taskNode != ''">task_node,</if>
+            <if test="task.taskNodeId != null and task.taskNodeId != ''">task_node_id,</if>
+            <if test="task.approvalChain != null and task.approvalChain != ''">approval_chain,</if>
+            <if test="task.taskType != null and task.taskType != ''">task_type,</if>
+            <if test="task.currentTaskUser != null and task.currentTaskUser != ''">current_task_user,</if>
+            <if test="task.procInsId != null and task.procInsId != ''">proc_ins_id,</if>
+            <if test="task.taskId != null and task.taskId != ''">task_id,</if>
+            <if test="task.operatorCode != null and task.operatorCode != ''">operator_code,</if>
+            <if test="task.isFinishTask != null and task.isFinishTask != ''">is_finish_task,</if>
+            gmt_create, gmt_modified,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="_databaseId == 'oracle'">PROCESS_TASK_SEQ.nextval,</if>
+            <if test="task.taskModule != null and task.taskModule != ''">#{task.taskModule},</if>
+            <if test="task.taskNode != null and task.taskNode != ''">#{task.taskNode},</if>
+            <if test="task.taskNodeId != null and task.taskNodeId != ''">#{task.taskNodeId},</if>
+            <if test="task.approvalChain != null and task.approvalChain != ''">#{task.approvalChain},</if>
+            <if test="task.taskType != null and task.taskType != ''">#{task.taskType},</if>
+            <if test="task.currentTaskUser != null and task.currentTaskUser != ''">#{task.currentTaskUser},</if>
+            <if test="task.procInsId != null and task.procInsId != ''">#{task.procInsId},</if>
+            <if test="task.taskId != null and task.taskId != ''">#{task.taskId},</if>
+            <if test="task.operatorCode != null and task.operatorCode != ''">#{task.operatorCode},</if>
+            <if test="task.isFinishTask != null and task.isFinishTask != ''">#{task.isFinishTask},</if>
+            <if test="_databaseId == 'oracle'">to_date(to_char(sysdate, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD
+                HH24:MI:SS'),
+            </if>
+            <if test="_databaseId == 'oracle'">to_date(to_char(sysdate, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD
+                HH24:MI:SS'),
+            </if>
+            <if test="_databaseId == 'mysql'">date_format(now(), '%Y-%m-%d %H:%i:%S'),</if>
+            <if test="_databaseId == 'mysql'">date_format(now(), '%Y-%m-%d %H:%i:%S'),</if>
+        </trim>
+    </insert>
+
+    <update id="updateTaskFinishStatus">
+        update act_proc_task
+        <set>
+            is_finish_task = #{task.isFinishTask}
+        </set>
+        <where>
+            and task_node_id = #{task.taskNodeId}
+            and proc_ins_id = #{task.procInsId}
+        </where>
+    </update>
+
+    <update id="updateTaskApprovalChain">
+        update act_proc_task
+        <set>
+            approval_chain = #{actTask.approvalChain},
+            current_task_user = #{actTask.currentTaskUser},
+            task_id = #{actTask.taskId}
+        </set>
+        <where>
+            and task_node_id = #{actTask.taskNodeId}
+            and proc_ins_id = #{actTask.procInsId}
+        </where>
+    </update>
+
+    <select id="selectDelegateTask" resultMap="ComProcTaskMap" parameterType="java.lang.String">
+        select
+        <include refid="selectComProcTaskVo"/>
+        from act_proc_task pt
+        <where>
+            and pt.task_node_id = #{taskNodeId}
+            and pt.proc_ins_id = #{procInstId}
+            and pt.is_finish_task = 'Have'
+            <if test="signType != null and signType != ''">
+                and pt.task_type = #{signType}
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询当前用户参与的或签流程 -->
+    <select id="selectDelegateRunTask" resultType="java.lang.String" parameterType="java.lang.String">
+        select
+        distinct(pt.proc_ins_id) as procInstId
+        from act_proc_task pt
+        left join act_ru_task res on
+        res.id_ = pt.task_node_id and res.proc_inst_id_ = pt.proc_ins_id and res.delegation_ = 'PENDING'
+        <where>
+            and pt.task_type = 'OrSigned'
+            and pt.is_finish_task = 'Have'
+            <if test="_databaseId == 'oracle'">
+                and pt.approval_chain like concat('%', concat(#{userCode}, '%'))
+            </if>
+            <if test="_databaseId == 'mysql'">
+                and pt.approval_chain like concat('%', #{userCode} ,'%')
+            </if>
+        </where>
+    </select>
+</mapper>
+

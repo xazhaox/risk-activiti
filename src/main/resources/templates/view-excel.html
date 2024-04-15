@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel在线操做/浏览</title>
+
+
+    <link rel='stylesheet' href='/luckysheet/pluginsCss.css' />
+    <link rel='stylesheet' href='/luckysheet/plugins.css' />
+    <link rel='stylesheet' href='/luckysheet/luckysheet.css' />
+    <link rel='stylesheet' href='/luckysheet/iconfont.css' />
+    <script src="/luckysheet/plugin.js"></script>
+    <script src="/luckysheet/luckysheet.umd.js"></script>
+</head>
+
+<body>
+
+<div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
+
+<!--<h1 class="test_view_excel_h1_style_class" id="view_excel_h1_style">-->
+<!--    测试在Index页面设置view-excel页面的h1标签样式-->
+<!--</h1>-->
+
+<script>
+    $(function () {
+        //配置项
+        var options = {
+            container: 'luckysheet' //luckysheet为容器id
+        }
+        luckysheet.create(options)
+    })
+</script>
+
+
+</body>
+</html>

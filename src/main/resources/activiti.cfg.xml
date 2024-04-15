@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                    http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 使用dbcp连接池配置数据源 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <!-- 配置数据库驱动 -->
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <!-- 配置数据库连接 -->
+        <property name="url"
+                  value="jdbc:mysql://127.0.0.1:3306/risk_activiti?useUnicode=true&amp;characterEncoding=utf8&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=GMT%2b8&amp;useSSL=true&amp;allowMultiQueries=true&amp;autoReconnect=true&amp;nullCatalogMeansCurrent=true"/>
+        <!-- 用户名 -->
+        <property name="username" value="root"/>
+        <!-- 密码 -->
+        <property name="password" value="xaroot"/>
+
+    </bean>
+
+    <!-- 自定义流程流程表ID生成策略 -->
+    <bean id="snowflake" class="com.xazhao.core.IdUtil"/>
+
+    <!-- 默认id对应的值 为processEngineConfiguration -->
+    <!-- processEngine Activiti的流程引擎 -->
+    <bean id="processEngineConfiguration"
+          class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+        <!-- 直接引用dbcp连接池配置 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- activiti数据库表生成策略 true表示如果数据库中存在相应的表, 那么直接使用, 如不存在直接创建 -->
+        <property name="databaseSchemaUpdate" value="true"/>
+        <!-- 指定主键生成器，activiti表中使用雪花算法生成主键 -->
+        <property name="idGenerator" ref="snowflake"/>
+        <!-- 生成流程图的字体 -->
+        <property name="activityFontName" value="宋体"/>
+        <property name="labelFontName" value="宋体"/>
+    </bean>
+</beans>

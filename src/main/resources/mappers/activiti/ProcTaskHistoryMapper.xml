@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 绑定namespace -->
+<mapper namespace="com.sinosoft.mapper.ProcTaskHistoryMapper">
+
+    <resultMap type="com.xazhao.dto.ProcTaskHistoryDTO" id="ComProcTaskHistoryMap">
+        <result property="id" column="id"/>
+        <result property="procTaskId" column="proc_task_id"/>
+        <result property="taskModule" column="task_module"/>
+        <result property="taskNode" column="task_node"/>
+        <result property="taskNodeId" column="task_node_id"/>
+        <result property="approvalChain" column="approval_chain"/>
+        <result property="taskType" column="task_type"/>
+        <result property="currentTaskUser" column="current_task_user"/>
+        <result property="procInsId" column="proc_ins_id"/>
+        <result property="taskId" column="task_id"/>
+        <result property="operatorCode" column="operator_code"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="gmtModified" column="gmt_modified"/>
+    </resultMap>
+
+    <!-- sql片段 -->
+    <sql id="selectComProcTaskHistoryVo">
+        id, proc_task_id, task_module, task_node, task_node_id, approval_chain, task_type, current_task_user, proc_ins_id, task_id, operator_code, gmt_create, gmt_modified
+    </sql>
+
+    <!-- 该表无需返回主键 -->
+    <insert id="insertTaskHistory" parameterType="com.xazhao.entity.ProcTaskHistory">
+        insert into act_proc_task_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="_databaseId == 'oracle'">id,</if>
+            proc_task_id,
+            <if test="taskHis.taskModule != null and taskHis.taskModule != ''">task_module,</if>
+            <if test="taskHis.taskNode != null and taskHis.taskNode != ''">task_node,</if>
+            <if test="taskHis.taskNodeId != null and taskHis.taskNodeId != ''">task_node_id,</if>
+            <if test="taskHis.approvalChain != null and taskHis.approvalChain != ''">approval_chain,</if>
+            <if test="taskHis.taskType != null and taskHis.taskType != ''">task_type,</if>
+            <if test="taskHis.currentTaskUser != null and taskHis.currentTaskUser != ''">current_task_user,</if>
+            <if test="taskHis.procInsId != null and taskHis.procInsId != ''">proc_ins_id,</if>
+            <if test="taskHis.taskId != null and taskHis.taskId != ''">task_id,</if>
+            <if test="taskHis.operatorCode != null and taskHis.operatorCode != ''">operator_code,</if>
+            gmt_create, gmt_modified,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="_databaseId == 'oracle'">PROCESS_TASK_SEQ.nextval,</if>
+            #{taskHis.procTaskId},
+            <if test="taskHis.taskModule != null and taskHis.taskModule != ''">#{taskHis.taskModule},</if>
+            <if test="taskHis.taskNode != null and taskHis.taskNode != ''">#{taskHis.taskNode},</if>
+            <if test="taskHis.taskNodeId != null and taskHis.taskNodeId != ''">#{taskHis.taskNodeId},</if>
+            <if test="taskHis.approvalChain != null and taskHis.approvalChain != ''">#{taskHis.approvalChain},</if>
+            <if test="taskHis.taskType != null and taskHis.taskType != ''">#{taskHis.taskType},</if>
+            <if test="taskHis.currentTaskUser != null and taskHis.currentTaskUser != ''">#{taskHis.currentTaskUser},
+            </if>
+            <if test="taskHis.procInsId != null and taskHis.procInsId != ''">#{taskHis.procInsId},</if>
+            <if test="taskHis.taskId != null and taskHis.taskId != ''">#{taskHis.taskId},</if>
+            <if test="taskHis.operatorCode != null and taskHis.operatorCode != ''">#{taskHis.operatorCode},</if>
+            <if test="_databaseId == 'oracle'">to_date(to_char(sysdate, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD
+                HH24:MI:SS'),
+            </if>
+            <if test="_databaseId == 'oracle'">to_date(to_char(sysdate, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD
+                HH24:MI:SS'),
+            </if>
+            <if test="_databaseId == 'mysql'">date_format(now(), '%Y-%m-%d %H:%i:%S'),</if>
+            <if test="_databaseId == 'mysql'">date_format(now(), '%Y-%m-%d %H:%i:%S'),</if>
+        </trim>
+    </insert>
+</mapper>
+

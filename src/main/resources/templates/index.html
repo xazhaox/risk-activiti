@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+<!-- SpringBoot集成Vue3和element-plus实现Activiti模型在线操做 -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 网页标签名称 -->
+    <title>Activiti流程设计器</title>
+    <!-- element-plus style -->
+    <link rel="stylesheet" href="/el/index.css"/>
+    <!-- vue v3.4.21 -->
+    <script src="/vue/vue.global.js"></script>
+    <!-- element-plus component library -->
+    <script src="/el/index.full.js"></script>
+    <!-- 国际化 -->
+    <script src="/el/zh-cn.js"></script>
+    <!-- element-plus icons -->
+    <script src="/el/index.iife.min.js"></script>
+    <!-- axios -->
+    <script src="/axios/axios.min.js"></script>
+
+    <!-- luckysheet Excel -->
+    <link rel='stylesheet' href='/luckysheet/pluginsCss.css' />
+    <link rel='stylesheet' href='/luckysheet/plugins.css' />
+    <link rel='stylesheet' href='/luckysheet/luckysheet.css' />
+    <link rel='stylesheet' href='/luckysheet/iconfont.css' />
+    <script src="/luckysheet/plugin.js"></script>
+    <script src="/luckysheet/luckysheet.umd.js"></script>
+</head>
+
+<!-- 流程编辑器全屏/最小化按钮样式 -->
+<style scoped>
+    /* 全屏按钮 */
+    .is_max_screen {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: var(--el-message-close-size, 16px);
+        height: 48px;
+        outline: none;
+        padding: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 48px;
+        margin-right: 20px;
+        padding-top: 9px;
+    }
+
+    .new_bpmn_model {
+        --el-dialog-padding-primary: 20px;
+    }
+
+    /* 设计器高度 */
+    .bpmn_model_style {
+        height: 745px;
+    }
+
+    /* 文字提示 */
+    .annotation_process_version_class {
+        width: 100%;
+        height: 35px;
+        font-size: 12px;
+        color: #cc0e06;
+        display: flex;
+        /* 居中 */
+        align-items: center;
+        /* 居中对齐，子元素位于弹性容器的中心 */
+        /*justify-content: center;*/
+    }
+
+    /* Excel在线编辑/预览 */
+    .lucky_sheet_online_operation_or_preview {
+        width: 100%;
+        height: 35px;
+        font-size: 12px;
+        color: #cc0e06;
+        display: flex;
+        align-items: center;
+    }
+</style>
+
+<!-- 网页主体 -->
+<body>
+
+<!-- 页面容器 -->
+<div id="bpmnModel" style="width: 80%; margin: 0 auto">
+    <h3>Activiti在线流程设计器</h3>
+    <!-- 查询 -->
+    <el-row>
+        <el-col :span="2" style="margin-bottom: 20px">
+            <el-button type="primary" @click="createModelDialog = true">新增模型</el-button>
+        </el-col>
+        <el-col :span="2" style="margin-bottom: 20px">
+            <el-button type="primary" icon="Search" @click="selectBpmnModel">查询</el-button>
+        </el-col>
+        <el-col :span="2" style="margin-bottom: 20px">
+            <el-button type="primary" plain @click="resetSelectParameter">重 置</el-button>
+        </el-col>
+        <el-col :span="6" style="margin-bottom: 20px;margin-right: -80px;">
+            <el-input v-model="bpmnName" @keyup.enter.native="selectBpmnModel" placeholder="请输入流程名称"
+                      style="width: 70%">
+            </el-input>
+        </el-col>
+        <el-col :span="6" style="margin-bottom: 20px">
+            <el-input v-model="bpmnKey" @keyup.enter.native="selectBpmnModel" placeholder="请输入流程Key"
+                      style="width: 70%">
+            </el-input>
+        </el-col>
+    </el-row>
+    <!-- 数据列表 -->
+    <el-table :data="bpmnPage"
+              stripe
+              border
+              style="width: 100%"
+              highlight-current-row
+              :header-cell-style="{'text-align':'center'}"
+              v-loading="loading"
+              empty-text="未查询到流程模型！">
+        <!-- 序号 -->
+        <el-table-column type="index" label="序号" align="center" width="80%"></el-table-column>
+        <!-- 流程名称 -->
+        <el-table-column prop="name" label="流程名称" width="230"></el-table-column>
+        <!-- 新增头像图片列 -->
+        <el-table-column prop="key" label="流程定义Key" width="180"></el-table-column>
+        <!-- 版本 -->
+        <el-table-column prop="version" label="部署版本" align="center" width="100"></el-table-column>
+        <!-- 发布状态 -->
+        <el-table-column prop="publishStatus" label="发布状态" align="center" width="140"></el-table-column>
+        <!-- 流程描述 -->
+        <el-table-column prop="description" label="流程描述" width="290"></el-table-column>
+        <!-- 创建时间 -->
+        <el-table-column prop="createTime" label="创建时间" align="center" width="190"></el-table-column>
+        <!-- 操做列 -->
+        <el-table-column fixed="right" align="center" label="操作">
+            <template #default="scope">
+                <el-button type="primary" round size="small" @click="designBpmnModel(scope.row)">设计</el-button>
+                <el-button type="success" round size="small" @click="publishBpmn(scope.row)">发布</el-button>
+                <el-button type="info" round size="small" @click="exportBpmnModel(scope.row)">导出</el-button>
+                <el-button type="danger" round size="small" @click="deleteBpmnModel(scope.row)">删除</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    <!-- 分页 -->
+    <el-row type="flex" justify="center" style="margin-top: 10px">
+        <!-- :small="true"使用小型分页样式 -->
+        <el-pagination
+                :small="true"
+                layout="total, sizes, prev, pager, next, jumper"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                v-model:current-page="pageNum"
+                v-model:page-size="pageSize"
+                :page-sizes="[10, 20, 50, 100]"
+                :total="total"
+                :hide-on-single-page="false"
+                :highlight-current-row="true">
+        </el-pagination>
+    </el-row>
+    <!-- 在线设计弹框 -->
+    <el-dialog :close-on-click-modal="false"
+               v-model="isViewDialog"
+               width="80%"
+               :fullscreen="isMaximumScreen"
+               align-center
+               :style="isMaximumScreen == true ? 'height:100%' : 'height: 90%'"
+               style="--el-dialog-padding-primary: 0px;"
+               :before-close="handleClose"
+               :close-on-press-escape="false"
+               close-icon="CloseBold">
+        <template #header>
+            <div style="font-size: 18px; font-weight: 600; padding-block: 10px;padding-left: 30px;padding-top: 20px;">
+                <span>Activiti流程设计器</span>
+            </div>
+            <div class="is_max_screen">
+                <el-button type="primary" link v-if="isMaximumScreen" @click="isMaximumScreen = !isMaximumScreen">
+                    <!-- 放大 -->
+                    <img src="/images/large.png" style="padding-bottom: 3px" alt="" srcset=""/>
+                </el-button>
+                <el-button type="primary" link v-else @click="isMaximumScreen = !isMaximumScreen">
+                    <!-- 缩小 -->
+                    <img src="/images/small.png" alt="" srcset="">
+                </el-button>
+            </div>
+        </template>
+        <div class="bpmn_model_style">
+            <iframe :src="bpmnIframeSrc" style="width: 100%; height: 100%" frameborder="0" scrolling="no"></iframe>
+        </div>
+    </el-dialog>
+    <!-- 新增模型弹框 -->
+    <el-dialog class="new_bpmn_model" v-model="createModelDialog" title="流程基本信息" width="35%"
+               style="align-content: center;height: 35%;" :before-close="handleDialogBeforeClose">
+        <!-- :rules="rules"校验规则 -->
+        <el-form ref="bpmnFormRef"
+                 :model="bpmnForm"
+                 :rules="rules"
+                 label-width="130px"
+                 class="demo-ruleForm"
+                 status-icon>
+            <el-form-item label="模型名称" prop="name">
+                <el-input v-model="bpmnForm.name" placeholder="请输入流程模型名称" style="width: 90%"></el-input>
+            </el-form-item>
+            <el-form-item label="标识Key" prop="key">
+                <el-input v-model="bpmnForm.key" placeholder="请输入流程模型Key" style="width: 90%"></el-input>
+            </el-form-item>
+            <el-form-item label="模型描述" prop="description">
+                <el-input v-model="bpmnForm.description" style="width: 90%" :autosize="{ minRows: 2, maxRows: 4 }"
+                          type="textarea" placeholder="请输入流程模型">
+                </el-input>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="resetBpmnForm">重 置</el-button>
+                <el-button type="primary" plain @click="handleDialogBeforeClose">取 消</el-button>
+                <el-button type="primary" @click="deviseBpmnModel">创 建</el-button>
+            </div>
+        </template>
+    </el-dialog>
+    <!-- 提示 -->
+    <div class="annotation_process_version_class">
+        <span>注：若重复部署同一流程会只会显示最新版本流程版本.</span>
+    </div>
+
+    <!-- LuckySheet实现Excel在线编辑/预览 -->
+    <div id="excel_operation_or_preview" class="lucky_sheet_online_operation_or_preview">
+        <span>LuckySheet：Excel在线操做/预览.</span>
+        <!-- 演示 -->
+        <el-upload ref="blankPreviewRef"
+                   :limit="1"
+                   :http-request="xlsBlankViewExcel"
+                   accept=".xls, .xlsx"
+                   :show-file-list="false">
+            <template #trigger>
+                <el-button type="success" text size="small" @click="xlsBlankViewExcel" style="margin-left: 10px;margin-top: 3px;">
+                    Preview excel xls - blank
+                </el-button>
+            </template>
+        </el-upload>
+        <!-- 弹框预览，删除自动上传:auto-upload="false"才可以触发:http-request定的函数 -->
+        <el-upload ref="dialogPreviewRef"
+                   :limit="1"
+                   :http-request="xlsxDialogViewExcel"
+                   :on-exceed="handleExceed"
+                   accept=".xls, .xlsx"
+                   :show-file-list="false">
+            <template #trigger>
+                <el-button type="success" text size="small" style="margin-top: 3px;">
+                    Preview excel xlsx - dialog
+                </el-button>
+            </template>
+        </el-upload>
+    </div>
+    <!-- Excel在线操做/浏览 -->
+    <el-dialog :close-on-click-modal="false"
+               v-model="isXlsxViewExcelDialog"
+               width="80%"
+               :fullscreen="isMaximumOperationDialog"
+               align-center
+               :style="isMaximumOperationDialog == true ? 'height:100%' : 'height: 90%'"
+               style="--el-dialog-padding-primary: 0px;"
+               :before-close="handleCloseExcelDialog"
+               :close-on-press-escape="false"
+               close-icon="CloseBold">
+        <template #header>
+            <div style="font-size: 18px; font-weight: 600; padding-block: 10px;padding-left: 30px;padding-top: 20px;">
+                <span>Excel在线操做/浏览</span>
+            </div>
+            <div class="is_max_screen">
+                <el-button type="primary" link v-if="isMaximumOperationDialog"
+                           @click="isMaximumOperationDialog = !isMaximumOperationDialog">
+                    <!-- 放大 -->
+                    <img src="/images/large.png" style="padding-bottom: 3px" alt="" srcset=""/>
+                </el-button>
+                <el-button type="primary" link v-else @click="isMaximumOperationDialog = !isMaximumOperationDialog">
+                    <!-- 缩小 -->
+                    <img src="/images/small.png" alt="" srcset="">
+                </el-button>
+            </div>
+        </template>
+        <div>
+            <h1>lucky sheet online operation or preview</h1>
+        </div>
+    </el-dialog>
+</div>
+
+<script type="application/javascript" charset="UTF-8">
+    // 从vue里解构（导出）模块
+    const {createApp, ref, reactive, toRefs} = Vue;
+    // 创建应用实例
+    const bpmnModel = Vue.createApp({
+        /**
+         * @Description 根组件选项
+         */
+        setup() {
+            // 双向绑定的响应式数据对象
+            const parameter = reactive({
+                loading: false,
+                bpmnName: '',
+                bpmnKey: '',
+                bpmnPage: [],
+                // 总数
+                total: 0,
+                // 当前页
+                pageNum: 1,
+                // 每页显示的数量
+                pageSize: 10,
+                // 新增Bpmn弹框
+                createModelDialog: false,
+                // 表单校验规则
+                rules: {
+                    /* 自定义校验规则{ required: true, validator: 自定义校验函数, trigger: 'blur' } */
+                    name: [{required: true, message: '请输入流程模型名称', trigger: 'blur'}],
+                    key: [
+                        {required: true, message: '请输入流程模型Key', trigger: 'blur'},
+                        {min: 1, max: 35, message: '流程模型Key长度在1 - 35个字符之间', trigger: 'blur'}
+                    ]
+                },
+                bpmnForm: {},
+                bpmnFormRef: null,
+                isViewDialog: false,
+                isMaximumScreen: false,
+                bpmnIframeSrc: '',
+                /* Excel在线操做/浏览 */
+                isXlsxViewExcelDialog: false,
+                isMaximumOperationDialog: false,
+                blankPreviewRef: null,
+                dialogPreviewRef: null
+            })
+
+            /* 查询 */
+            const selectBpmnModel = () => {
+                // 加载状态
+                parameter.loading = true;
+                // GET方式请求
+                axios.get('/bpmn/model/queryPage', {
+                    // 请求参数
+                    params: {
+                        pageNum: parameter.pageNum,
+                        pageSize: parameter.pageSize,
+                        name: parameter.bpmnName,
+                        key: parameter.bpmnKey
+                    }
+                }).then(function (response) {
+                    // 请求成功
+                    parameter.bpmnPage = response.data.list;
+                    parameter.total = response.data.total;
+                    // 加载结束
+                    parameter.loading = false;
+                }).catch(function (error) {
+                    parameter.loading = false;
+                    ElementPlus.ElMessage({
+                        message: '错误，数据加载异常.',
+                        type: 'error',
+                        plain: true,
+                    })
+                    // 请求异常处理
+                    console.log(error);
+                });
+            }
+
+            /* 新增模型，打开弹窗，await运算符只能在async函数中使用 */
+            const deviseBpmnModel = async () => {
+                // 校验表单是否通过
+                await parameter.bpmnFormRef.validate((valid, fields) => {
+                    if (valid) {
+                        axios({
+                            method: 'post',
+                            url: '/bpmn/model/designModel',
+                            data: {
+                                name: parameter.bpmnForm.name,
+                                key: parameter.bpmnForm.key,
+                                description: parameter.bpmnForm.description
+                            },
+                        }).then(function (response) {
+                            // 关闭弹框
+                            parameter.createModelDialog = false;
+                            if (200 === response.data.code) {
+                                selectBpmnModel();
+                                ElementPlus.ElMessage({
+                                    message: '模型创建成功，数据操作列可进行模型设计.',
+                                    type: 'success',
+                                    plain: true,
+                                })
+                            } else {
+                                ElementPlus.ElMessage({
+                                    message: response.data.returnMsg,
+                                    type: 'error',
+                                    plain: true,
+                                })
+                            }
+                            // 清空form表单
+                            parameter.bpmnFormRef.resetFields();
+                            // 暂不跳转页面，从数据行后的操作列点设计进入模型设计页面
+                            console.log(response);
+                        }).catch(function (error) {
+                            ElementPlus.ElMessage({
+                                message: '错误，创建模型出错.',
+                                type: 'error',
+                                plain: true,
+                            })
+                            console.log(error);
+                        });
+                    } else {
+                        ElementPlus.ElMessage({
+                            message: '请填写必填项.',
+                            type: 'error',
+                            plain: true,
+                        })
+                        console.log('error submit!', fields)
+                    }
+                })
+            }
+
+            /* 设计模型，页面跳转与弹框打开方式任选其一即可 */
+            const designBpmnModel = (val) => {
+                const bpmnId = val.id;
+                if (null !== bpmnId && '' !== bpmnId) {
+                    /* 弹框方式：将modeler.html文件的style标签中的所有样式全部打开，将save-model.html中Save and close editor按钮关闭 */
+                    parameter.isViewDialog = true;
+                    parameter.bpmnIframeSrc = "/modeler.html?modelId=" + bpmnId;
+
+                    /* 页面跳转方式：将modeler.html文件的style标签中的所有样式全部注释，将save-model.html中Save and close editor按钮打开 */
+                    // const  ipPort = window.location.origin;
+                    // window.location.href = ipPort + '/modeler.html?modelId=' + bpmnId;
+                } else {
+                    ElementPlus.ElMessage({
+                        message: '错误，未查询到该流程模型.',
+                        type: 'error',
+                        plain: true,
+                    })
+                }
+            }
+
+            /* 发布模型 */
+            const publishBpmn = (val) => {
+                const bpmnId = val.id;
+                if (null !== bpmnId && '' !== bpmnId) {
+                    if ("已发布" === val.publishStatus) {
+                        ElementPlus.ElMessageBox.confirm('模型已发布，重复发布会进行版本迭代. 是否操做?', '提示', {
+                                confirmButtonText: '发 布',
+                                cancelButtonText: '取 消',
+                                type: 'warning',
+                            }
+                        ).then(() => {
+                            axiosGetPublishModel('模型发布成功，流程版本已迭代.', bpmnId);
+                        }).catch(() => {
+                            ElementPlus.ElMessage({
+                                type: 'info',
+                                message: '取消选择',
+                                plain: true,
+                            })
+                        })
+                    } else {
+                        axiosGetPublishModel('模型发布成功.', bpmnId);
+                    }
+                }
+            }
+
+            /* 执行请求 */
+            const axiosGetPublishModel = (val, bpmnId) => {
+                axios.get('/bpmn/model/deploy', {
+                    params: {
+                        bpmnSourceId: bpmnId
+                    }
+                }).then(function (response) {
+                    if (200 === response.data.code) {
+                        ElementPlus.ElMessage({
+                            message: val,
+                            type: 'success',
+                            plain: true,
+                        })
+                        selectBpmnModel();
+                    } else {
+                        ElementPlus.ElMessage({
+                            message: response.data.returnMsg,
+                            type: 'error',
+                            plain: true,
+                        })
+                    }
+                    console.log(response);
+                }).catch(function (error) {
+                    ElementPlus.ElMessage({
+                        message: '错误，发布失败.',
+                        type: 'error',
+                        plain: true,
+                    })
+                    console.log(error);
+                });
+            }
+
+            /* 导出模型 */
+            const exportBpmnModel = (val) => {
+                if (null !== val) {
+                    axios({
+                        method: 'post',
+                        url: '/bpmn/model/export',
+                        data: val,
+                        // 需要服务器返回一个 Blob 对象
+                        responseType: 'blob',
+                    }).then(function (response) {
+                        const bpmnZipName = val.name;
+                        if (200 === response.status && null !== bpmnZipName && '' !== bpmnZipName) {
+                            const blob = new Blob([response.data]);
+                            if (blob.size <= 0) {
+                                ElementPlus.ElMessage({
+                                    message: '空模型，请先设计模型在进行导出.',
+                                    type: 'error',
+                                    plain: true,
+                                })
+                                return;
+                            }
+                            // 创建a标签
+                            const element = document.createElement("a");
+                            // 创建下载的链接
+                            element.href = window.URL.createObjectURL(blob);
+                            element.download = bpmnZipName + '.zip';
+                            element.style.display = "none";
+                            //a标签追加元素到body内
+                            document.body.appendChild(element);
+                            //模拟点击下载
+                            element.click();
+                            // 下载完成移除元素
+                            document.body.removeChild(element);
+                            // 释放掉blob对象
+                            window.URL.revokeObjectURL(element.href);
+                            ElementPlus.ElMessage({
+                                message: '流程模型导出成功.',
+                                type: 'success',
+                                plain: true,
+                            })
+                        } else {
+                            ElementPlus.ElMessage({
+                                message: '接口请求异常，导出失败.',
+                                type: 'error',
+                                plain: true,
+                            })
+                        }
+                        console.log(response);
+                    }).catch(function (error) {
+                        ElementPlus.ElMessage({
+                            message: '错误，导出失败.',
+                            type: 'error',
+                            plain: true,
+                        })
+                        console.log(error);
+                    });
+                }
+            }
+
+            /* 删除模型 */
+            const deleteBpmnModel = (val) => {
+                const bpmnId = val.id;
+                if (null !== bpmnId && '' !== bpmnId) {
+                    axios({
+                        method: 'post',
+                        url: '/bpmn/model/delete/' + bpmnId,
+                    }).then(function (response) {
+                        if (200 === response.data.code) {
+                            ElementPlus.ElMessage({
+                                message: '成功，模型删除成功.',
+                                type: 'success',
+                                plain: true,
+                            })
+                            selectBpmnModel();
+                        } else {
+                            ElementPlus.ElMessage({
+                                message: response.data.returnMsg,
+                                type: 'error',
+                                plain: true,
+                            })
+                        }
+                        console.log(response);
+                    }).catch(function (error) {
+                        ElementPlus.ElMessage({
+                            message: '错误，删除模型请求出现异常.',
+                            type: 'error',
+                            plain: true,
+                        })
+                        console.log(error);
+                    });
+                }
+            }
+
+            /* 每页条数改变 */
+            const handleSizeChange = (val) => {
+                parameter.pageSize = val
+                selectBpmnModel();
+            }
+
+            /* 当前页改变 */
+            const handleCurrentChange = (val) => {
+                parameter.pageNum = val;
+                selectBpmnModel();
+            }
+
+            /* 重置form表单 */
+            const resetBpmnForm = () => {
+                parameter.bpmnForm = {};
+            }
+
+            /* 重置搜索框 */
+            const resetSelectParameter = () => {
+                parameter.bpmnName = null;
+                parameter.bpmnKey = null;
+            }
+
+            /* 关闭弹框 */
+            const handleClose = () => {
+                selectBpmnModel();
+                parameter.isViewDialog = false;
+                // 关闭时最小化弹框，防止再次打开为全屏
+                parameter.isMaximumScreen = false;
+            };
+
+            /* 关闭弹框，清除所有数据 */
+            const handleDialogBeforeClose = () => {
+                parameter.createModelDialog = false;
+                parameter.bpmnFormRef.resetFields();
+            };
+
+            /* 打开新页面操做Excel */
+            const xlsBlankViewExcel = (val) => {
+                // 打开新页面
+                window.open("view-excel.html", "_blank");
+
+                console.log("新页面：", val);
+            };
+
+            /* 弹框操做Excel */
+            const xlsxDialogViewExcel = (val) => {
+                const xlsxFile = val.file;
+                if (null !== xlsxFile) {
+                    const isXlsxFlag = verifySuffix(xlsxFile);
+                    if (!isXlsxFlag) {
+                        return;
+                    }
+                    parameter.isXlsxViewExcelDialog = true;
+                    console.log("弹框预览：", val.file);
+                    // 展示Excel
+                }
+            };
+
+            /* 关闭弹框操做Excel弹框 */
+            const handleCloseExcelDialog = () => {
+                parameter.isXlsxViewExcelDialog = false;
+                // 关闭时最小化弹框，防止再次打开为全屏
+                parameter.isMaximumOperationDialog = false;
+            };
+
+            /* 重新上传覆盖之前的文件 */
+            const handleExceed = (files) => {
+                const xlsxFile = files[0];
+                if (null !== xlsxFile) {
+                    const isXlsxFlag = verifySuffix(xlsxFile);
+                    if (!isXlsxFlag) {
+                        return;
+                    }
+                    // 清空文件
+                    parameter.dialogPreviewRef.clearFiles();
+                    // 设置文件
+                    parameter.dialogPreviewRef.handleStart(xlsxFile)
+                    parameter.isXlsxViewExcelDialog = true;
+                    // 展示Excel
+                }
+            };
+
+            const verifySuffix = (xlsxFile) => {
+                if (null !== xlsxFile) {
+                    const xlsxName = xlsxFile.name;
+                    const suffixArr = xlsxName.split("."), suffix = suffixArr[suffixArr.length - 1];
+                    if ('xls' !== suffix && 'xlsx' !== suffix) {
+                        ElementPlus.ElMessage({
+                            message: '错误，在线预览只支持xls、xlsx两种类型.',
+                            type: 'error',
+                            plain: true,
+                        })
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            /* 将响应式对象中的所有属性转为单独的响应式数据，如：const bpmnName = ref(""); */
+            const dataRef = toRefs(parameter);
+            return {
+                ...dataRef,
+                deviseBpmnModel,
+                selectBpmnModel,
+                designBpmnModel,
+                publishBpmn,
+                axiosGetPublishModel,
+                exportBpmnModel,
+                deleteBpmnModel,
+                handleSizeChange,
+                handleCurrentChange,
+                resetBpmnForm,
+                resetSelectParameter,
+                handleClose,
+                handleDialogBeforeClose,
+                /* Excel在在线操做 */
+                xlsBlankViewExcel,
+                xlsxDialogViewExcel,
+                handleCloseExcelDialog,
+                verifySuffix,
+                handleExceed,
+            };
+        },
+    });
+
+    // 全局注册所有图标
+    for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+        bpmnModel.component(key, component)
+    }
+    // 引入element-plus，{ locale: ElementPlusLocaleZhCn }引入国际化中文， 挂载VueRouter
+    bpmnModel.use(ElementPlus, {locale: ElementPlusLocaleZhCn});
+    // 挂载应用，.mount()方法应该始终在整个应用配置和资源注册完成后被调用
+    bpmnModel.mount("#bpmnModel");
+</script>
+
+</body>
+</html>

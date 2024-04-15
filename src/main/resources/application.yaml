@@ -1,0 +1,48 @@
+server:
+  port: 49086
+
+spring:
+  application:
+    name: risk-activiti
+  web:
+    resources:
+      # templates目录下的文件无法直接访问，需要在static-locations中加入templates
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,classpath:/templates/
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+  datasource:
+    name: mysql
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      url: jdbc:mysql://127.0.0.1:3306/risk_activiti?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true&autoReconnect=true&keepAlive=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000&nullCatalogMeansCurrent=true
+      username: root
+      password: xaroot
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      initial-size: 20
+      min-idle: 20
+      max-active: 100
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+
+mybatis:
+  type-aliases-package: com.sinosoft.entity, com.sinosoft.dto
+  mapper-locations: classpath*:mappers/**/*Mapper.xml
+  # 加载全局配置
+  configuration:
+    cache-enabled: true
+    use-generated-keys: true
+    default-executor-type: reuse
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+# spring-boot项目启动时是否打开浏览器
+browser:
+  auto:
+    is-open-browser: false

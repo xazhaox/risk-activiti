@@ -17,7 +17,7 @@ SpringBoot集成Vue3和element-plus实现Activiti模型在线操做
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.xazhao</groupId>
+    <groupId>com.sinosoft</groupId>
     <artifactId>risk-activiti</artifactId>
     <version>2024.3.1-SNAPSHOT</version>
 
@@ -43,8 +43,7 @@ SpringBoot集成Vue3和element-plus实现Activiti模型在线操做
         <!-- 依赖包版本管理 -->
         <spring-boot.version>2.7.12</spring-boot.version>
         <activiti.version>5.19.0</activiti.version>
-        <batik.version>1.7</batik.version>
-        <satoken.version>1.34.0</satoken.version>
+        <batik.version>1.17</batik.version>
         <mysql-connector.version>8.0.33</mysql-connector.version>
         <druid.version>1.2.18</druid.version>
         <spring-mybatis.version>2.3.1</spring-mybatis.version>
@@ -58,19 +57,7 @@ SpringBoot集成Vue3和element-plus实现Activiti模型在线操做
     </properties>
 
     <dependencies>
-        <!-- Activiti -->
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-spring-boot-starter-basic</artifactId>
-            <version>${activiti.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-json-converter</artifactId>
-            <version>${activiti.version}</version>
-        </dependency>
-
+        <!-- Activiti核心模块 -->
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-engine</artifactId>
@@ -81,6 +68,13 @@ SpringBoot集成Vue3和element-plus实现Activiti模型在线操做
                     <artifactId>mybatis</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Activiti -->
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-spring-boot-starter-basic</artifactId>
+            <version>${activiti.version}</version>
         </dependency>
 
         <!-- Activiti流程图 -->
@@ -97,7 +91,47 @@ SpringBoot集成Vue3和element-plus实现Activiti模型在线操做
             <version>${activiti.version}</version>
         </dependency>
 
-        <!-- batik相关 -->
+        <!-- Java绘制Activiti流程图 -->
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-image-generator</artifactId>
+            <version>${activiti.version}</version>
+        </dependency>
+
+        <!-- Activiti Json转换器 -->
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-json-converter</artifactId>
+            <version>${activiti.version}</version>
+        </dependency>
+
+        <!-- Activiti Bpmn转换器 -->
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-bpmn-converter</artifactId>
+            <version>${activiti.version}</version>
+        </dependency>
+
+        <!-- Bpmn模型处理器 -->
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-bpmn-model</artifactId>
+            <version>${activiti.version}</version>
+        </dependency>
+
+        <!-- SVN转换PNG图片batik相关工具 -->
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-transcoder</artifactId>
+            <version>${batik.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-bridge</artifactId>
+            <version>${batik.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-codec</artifactId>

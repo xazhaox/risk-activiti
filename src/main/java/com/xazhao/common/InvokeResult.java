@@ -92,14 +92,4 @@ public class InvokeResult {
         result.setErrorMsg(errorMsg);
         return result;
     }
-
-    /**
-     * 响应返回结果
-     *
-     * @param rows 影响行数
-     * @return 操作结果
-     */
-    public static InvokeResult toResult(int rows) {
-        return rows > 0 ? InvokeResult.success(null, "操作成功") : InvokeResult.failure("操作失败");
-    }
 }

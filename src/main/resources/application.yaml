@@ -32,7 +32,7 @@ spring:
       test-on-return: false
 
 mybatis:
-  type-aliases-package: com.sinosoft.entity, com.sinosoft.dto
+  type-aliases-package: com.xazhao.entity, com.xazhao.dto
   mapper-locations: classpath*:mappers/**/*Mapper.xml
   # 加载全局配置
   configuration:

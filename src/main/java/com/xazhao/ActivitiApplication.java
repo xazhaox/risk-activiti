@@ -20,6 +20,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @MapperScan("com.sinosoft.mapper")
 @SpringBootApplication(exclude = {
         JpaProcessEngineAutoConfiguration.class,
+        // Springboot和activity-rest一般默认自带http basic的security安全验证，需要排除以下Class
         org.activiti.spring.boot.SecurityAutoConfiguration.class,
         org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class})
 public class ActivitiApplication {

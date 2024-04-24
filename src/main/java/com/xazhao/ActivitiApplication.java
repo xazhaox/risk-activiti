@@ -17,7 +17,7 @@ import tk.mybatis.spring.annotation.MapperScan;
  */
 
 @Slf4j
-@MapperScan("com.sinosoft.mapper")
+@MapperScan("com.xazhao.mapper")
 @SpringBootApplication(exclude = {
         JpaProcessEngineAutoConfiguration.class,
         // Springboot和activity-rest一般默认自带http basic的security安全验证，需要排除以下Class

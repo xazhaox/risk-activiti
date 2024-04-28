@@ -10,15 +10,9 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import java.text.SimpleDateFormat;
 
 /**
- * @ClassName JsonConfig.java
- * @Author AnZhaoxu
- * @Create 2024.04.11
- * @UpdateUser
- * @UpdateDate 2024.04.11
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/04/11.
+ * @Author xaZhao
  */
-
 
 // @Configuration
 public class JsonConfig {

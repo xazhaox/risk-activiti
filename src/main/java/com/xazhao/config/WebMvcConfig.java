@@ -10,13 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @ClassName SpringMvcConfig.java
- * @Author AnZhaoxu
- * @Create 2024.04.11
- * @UpdateUser
- * @UpdateDate 2024.04.11
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/04/11.
+ * @Author xaZhao
  */
 
 // @Configuration

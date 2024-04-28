@@ -7,13 +7,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * @ClassName SpringUtils.java
- * @Author AnZhaoxu
- * @Create 2024.03.25
- * @UpdateUser
- * @UpdateDate 2024.03.25
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/03/25.
+ * @Author xaZhao
  */
 
 @Component

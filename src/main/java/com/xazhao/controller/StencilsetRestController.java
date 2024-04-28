@@ -12,13 +12,8 @@ import java.io.InputStream;
 /**
  * 模具集Rest资源
  *
- * @ClassName StencilsetRestResource.java
- * @Author AnZhaoxu
- * @Create 2024.04.01
- * @UpdateUser
- * @UpdateDate 2024.04.01
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/04/01.
+ * @Author xaZhao
  */
 
 @SuppressWarnings("all")

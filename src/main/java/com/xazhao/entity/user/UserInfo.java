@@ -15,13 +15,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * @ClassName UserInfo.java
- * @Author AnZhaoxu
- * @Create 2024.03.27
- * @UpdateUser
- * @UpdateDate 2024.03.27
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/03/27.
+ * @Author xaZhao
  */
 
 @Data

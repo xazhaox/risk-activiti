@@ -52,13 +52,8 @@ import java.util.zip.ZipOutputStream;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * @ClassName BpmnModelServiceImpl.java
- * @Author AnZhaoxu
- * @Create 2024.03.22
- * @UpdateUser
- * @UpdateDate 2024.03.22
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/03/22.
+ * @Author xaZhao
  */
 
 @Slf4j
@@ -482,6 +477,9 @@ public class BpmnModelServiceImpl implements BpmnModelService, ModelDataJsonCons
     @Override
     public InvokeResult deleteBpmnModel(String bpmnId) {
         if (isNotBlank(bpmnId)) {
+            if ("90001".equals(bpmnId)) {
+                return InvokeResult.failure("错误，初始化流程模型无法删除. ");
+            }
             try {
                 repositoryService.deleteModel(bpmnId);
                 return InvokeResult.success(null, "删除成功！");

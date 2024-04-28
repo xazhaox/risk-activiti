@@ -367,7 +367,7 @@ mybatis:
 ```java
 提取Activiti-activiti-5.19.0项目中
     StencilsetRestResource.java(模具集Rest资源)
-    ModelEditorJsonRestResource.java(模板编辑)
+    ModelEditorJsonRestResource.java(模型编辑)
     ModelSaveRestResource.java (模型保存)
 ```
 
@@ -398,13 +398,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.InputStream;
 
 /**
- * @ClassName StencilsetRestResource.java
- * @Author XaZhao
- * @Create 2024.04.01
- * @UpdateUser
- * @UpdateDate 2024.04.01
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/04/01.
+ * @Author xaZhao
  */
 
 @RestController
@@ -456,13 +451,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * @ClassName ModelEditorJsonRestResource.java
- * @Author XaZhao
- * @Create 2024.04.01
- * @UpdateUser
- * @UpdateDate 2024.04.01
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/04/01.
+ * @Author xaZhao
  */
 
 @Slf4j
@@ -547,13 +537,8 @@ import java.nio.charset.StandardCharsets;
 
 
 /**
- * @ClassName ModelSaveRestResource.java
- * @Author XaZhao
- * @Create 2024.04.01
- * @UpdateUser
- * @UpdateDate 2024.04.01
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/04/01.
+ * @Author xaZhao
  */
 
 @Slf4j
@@ -714,8 +699,6 @@ ACTIVITI.CONFIG = {
 [^stencilset_en.json汉化json文件]: 
 
 [stencilset.json](../src/main/resources/activiti/stencilset_en.json)
-
-
 
 
 

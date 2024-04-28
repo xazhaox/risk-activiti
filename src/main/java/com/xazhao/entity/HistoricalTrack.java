@@ -13,13 +13,8 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
- * @ClassName HistoricalTrack.java
- * @Author AnZhaoxu
- * @Create 2024.03.21
- * @UpdateUser
- * @UpdateDate 2024.03.21
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/03/21.
+ * @Author xaZhao
  */
 
 @Entity

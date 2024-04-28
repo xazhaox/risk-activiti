@@ -1,13 +1,8 @@
 package com.xazhao.constant;
 
 /**
- * @ClassName Constant.java
- * @Author AnZhaoxu
- * @Create 2024.04.11
- * @UpdateUser
- * @UpdateDate 2024.04.11
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/04/11.
+ * @Author xaZhao
  */
 
 public class Constant {

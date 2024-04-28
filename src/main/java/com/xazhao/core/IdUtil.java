@@ -4,13 +4,8 @@ import org.activiti.engine.impl.cfg.IdGenerator;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @ClassName IdUtil.java
- * @Author AnZhaoxu
- * @Create 2024.03.22
- * @UpdateUser
- * @UpdateDate 2024.03.22
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/03/22.
+ * @Author xaZhao
  */
 
 @Configuration

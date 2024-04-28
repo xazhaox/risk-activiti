@@ -5,13 +5,8 @@ import org.activiti.engine.runtime.ProcessInstance;
 import java.util.Map;
 
 /**
- * @ClassName ProcessInstanceService.java
- * @Author AnZhaoxu
- * @Create 2024.03.22
- * @UpdateUser
- * @UpdateDate 2024.03.22
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/03/22.
+ * @Author xaZhao
  */
 
 public interface ProcessInstanceService {

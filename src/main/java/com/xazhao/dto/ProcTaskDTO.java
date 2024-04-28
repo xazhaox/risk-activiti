@@ -5,12 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @ClassName ActProcTaskDTO.java
- * @Author AnZhaoxu
- * @Create 2024.03.21
- * @UpdateUser
- * @UpdateDate 2024.03.21
- * @Description
+ * @Description Created on 2024/03/21.
+ * @Author xaZhao
  */
 
 @Data

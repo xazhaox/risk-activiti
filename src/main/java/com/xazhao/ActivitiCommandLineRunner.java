@@ -17,13 +17,8 @@ import java.net.InetAddress;
  * 使用CommandLineRunner接口，可以在应用程序启动后执行一些必要的初始化操作<br/>
  * 例如：加载配置文件、初始化数据库连接、创建默认数据等
  *
- * @ClassName ActivitiCommandLineRunner.java
- * @Author AnZhaoxu
- * @Create 2024.04.11
- * @UpdateUser
- * @UpdateDate 2024.04.11
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/04/11.
+ * @Author xaZhao
  */
 
 @Slf4j

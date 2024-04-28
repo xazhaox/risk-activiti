@@ -1,25 +1,19 @@
 package com.xazhao;
 
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import tk.mybatis.spring.annotation.MapperScan;
 
 /**
- * @ClassName ActivitiApplication.java
- * @Author AnZhaoxu
- * @Create 2024.03.21
- * @UpdateUser
- * @UpdateDate 2024.03.21
- * @Version 2024.0.1
- * @Description
+ * @Description Created on 2024/03/21.
+ * @Author xaZhao
  */
 
 @Slf4j
 @MapperScan("com.xazhao.mapper")
 @SpringBootApplication(exclude = {
-        JpaProcessEngineAutoConfiguration.class,
+        org.activiti.spring.boot.JpaProcessEngineAutoConfiguration.class,
         // Springboot和activity-rest一般默认自带http basic的security安全验证，需要排除以下Class
         org.activiti.spring.boot.SecurityAutoConfiguration.class,
         org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class})

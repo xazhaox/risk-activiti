@@ -13,12 +13,8 @@ import java.util.Date;
 /**
  * 流程任务信息记录表
  *
- * @ClassName ActProcTaskHistory.java
- * @Author AnZhaoxu
- * @Create 2024.03.21
- * @UpdateUser
- * @UpdateDate 2024.03.21
- * @Description
+ * @Description Created on 2024/03/21.
+ * @Author xaZhao
  */
 
 @Data

@@ -18,13 +18,17 @@ import org.activiti.engine.ProcessEngines;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.task.Task;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Description Created on 2024/03/21.
@@ -77,6 +81,73 @@ public class SignTaskServiceImpl implements SignTaskService {
 
     @Resource
     private HistoricTrackMapper historicTrackMapper;
+
+    /**
+     * 完成委派任务
+     *
+     * @param user       当前登录用户
+     * @param procInstId 流程实例ID
+     * @return 是否是完成委派任务
+     */
+    public Boolean completeDelegateTask(UserInfo user, String procInstId) {
+        Task task = taskService.createTaskQuery()
+                .processInstanceId(procInstId).taskCandidateOrAssigned(user.getUserCode()).singleResult();
+        // 完成委托任务
+        if (ObjectUtil.isNotEmpty(task.getDelegationState()) && PENDING.equals(task.getDelegationState().name())) {
+            String taskId = task.getId();
+            taskService.resolveTask(taskId);
+            // 若多人会签，设置下一审批人
+            ProcTask actProcTask = procTaskMapper.selectDelegateTask(taskId, procInstId, null);
+            if (ObjectUtil.isNotEmpty(actProcTask)) {
+                ProcTaskHistory taskHistory = new ProcTaskHistory();
+                BeanUtils.copyProperties(actProcTask, taskHistory, "id");
+                taskHistory.setProcTaskId(actProcTask.getId());
+                taskHistoryMapper.insertTaskHistory(taskHistory);
+            }
+            if (OR_SIGNED.equals(actProcTask.getTaskType())) {
+                // 或签流程
+                updateTaskAssigneeStatus(taskId, actProcTask);
+                return true;
+            }
+            List<String> approvalChainList = new ArrayList<>(Arrays.asList(actProcTask.getApprovalChain().split(",")));
+            // 删除第一审批人
+            if (approvalChainList.size() > 1 && approvalChainList.get(0).equals(user.getUserCode())) {
+                approvalChainList.remove(0);
+                // 记录新审批链
+                actProcTask.setApprovalChain(String.join(",", approvalChainList));
+                String currentTaskUser = approvalChainList.get(0);
+                actProcTask.setCurrentTaskUser(currentTaskUser);
+                TaskEntity newTask = createNewTask(task);
+                taskService.saveTask(newTask);
+                String newTaskId = newTask.getId();
+                taskService.addComment(newTaskId, task.getProcessInstanceId(),
+                        "<" + user.getUserName() + "> 通过加签任务，下一节点负责人为 <" + currentTaskUser + ">");
+                taskService.delegateTask(taskId, currentTaskUser);
+                taskService.complete(newTaskId);
+                actProcTask.setTaskId(newTaskId);
+                procTaskMapper.updateTaskApprovalChain(actProcTask);
+            }
+            // 最后一个用户审批时修改任务状态
+            if (approvalChainList.size() == 1 && approvalChainList.get(0).equals(user.getUserCode())) {
+                updateTaskAssigneeStatus(taskId, actProcTask);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 修改任务审批状态，流程返回加签用户
+     *
+     * @param taskId      任务ID
+     * @param actProcTask 加签信息
+     */
+    public void updateTaskAssigneeStatus(String taskId, ProcTask actProcTask) {
+        actProcTask.setIsFinishTask(FINISH);
+        procTaskMapper.updateTaskFinishStatus(actProcTask);
+        taskService.setAssignee(taskId, actProcTask.getOperatorCode());
+        taskService.setOwner(taskId, actProcTask.getOperatorCode());
+    }
 
     /**
      * 任务转办

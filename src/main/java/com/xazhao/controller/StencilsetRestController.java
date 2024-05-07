@@ -29,7 +29,9 @@ public class StencilsetRestController {
      */
     @RequestMapping(value = "/bpmn/editor/stencilset", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
     public @ResponseBody String getStencilset() {
-        InputStream stencilsetStream = this.getClass().getClassLoader().getResourceAsStream("activiti/stencilset_en.json");
+        // String stencilset = "activiti/stencilset.json";
+        String stencilset = "activiti/stencilset_en.json";
+        InputStream stencilsetStream = this.getClass().getClassLoader().getResourceAsStream(stencilset);
         try {
             return IOUtils.toString(stencilsetStream, UTF8);
         } catch (Exception e) {

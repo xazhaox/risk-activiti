@@ -34,7 +34,7 @@ public class JsonConfig {
         // 反序列化的时候如果多了其他属性,不抛出异常
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // 日期格式处理
-        objectMapper.setDateFormat(new SimpleDateFormat(Constant.YYYY_MM_DD_HH_MM_SS));
+        objectMapper.setDateFormat(new SimpleDateFormat(Constant.NORM_DATETIME_PATTERN));
         return objectMapper;
     }
 }

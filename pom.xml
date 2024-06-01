@@ -109,37 +109,7 @@
         <!-- SVN转换PNG图片batik相关工具 -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-transcoder</artifactId>
-            <version>${batik.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-bridge</artifactId>
-            <version>${batik.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-codec</artifactId>
-            <version>${batik.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-css</artifactId>
-            <version>${batik.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-svg-dom</artifactId>
-            <version>${batik.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-svggen</artifactId>
+            <artifactId>batik-all</artifactId>
             <version>${batik.version}</version>
         </dependency>
 
@@ -149,6 +119,12 @@
             <artifactId>persistence-api</artifactId>
             <version>${persistence.version}</version>
         </dependency>
+
+        <!-- thymeleaf -->
+        <!-- <dependency> -->
+        <!--     <groupId>org.springframework.boot</groupId> -->
+        <!--     <artifactId>spring-boot-starter-thymeleaf</artifactId> -->
+        <!-- </dependency> -->
 
         <!-- web -->
         <dependency>

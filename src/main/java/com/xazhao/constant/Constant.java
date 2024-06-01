@@ -7,7 +7,15 @@ package com.xazhao.constant;
 
 public class Constant {
 
-    public final static String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    /**
+     * 标准日期时间格式，精确到秒：yyyy-MM-dd HH:mm:ss
+     */
+    public static final String NORM_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
+    /**
+     * 日期时间格式，精确到秒：yyyy/MM/dd HH:mm:ss
+     */
+    public final static String NORM_SLASH = "yyyy/MM/dd HH:mm:ss";
 
     public final static String HTTP = "http://";
 

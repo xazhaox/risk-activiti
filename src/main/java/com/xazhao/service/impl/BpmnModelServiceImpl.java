@@ -278,8 +278,8 @@ public class BpmnModelServiceImpl implements BpmnModelService, ModelDataJsonCons
             bpmnMode.setKey(model.getKey());
             String modelName = model.getName();
             bpmnMode.setName(modelName);
-            bpmnMode.setCreateTime(DateUtil.format(model.getCreateTime(), Constant.YYYY_MM_DD_HH_MM_SS));
-            bpmnMode.setLastUpdateTime(DateUtil.format(model.getLastUpdateTime(), Constant.YYYY_MM_DD_HH_MM_SS));
+            bpmnMode.setCreateTime(DateUtil.format(model.getCreateTime(), Constant.NORM_SLASH));
+            bpmnMode.setLastUpdateTime(DateUtil.format(model.getLastUpdateTime(), Constant.NORM_SLASH));
             bpmnMode.setMetaInfo(model.getMetaInfo());
             bpmnMode.setVersion(Activiti.NOT_DEPLOYED);
             // 模型描述

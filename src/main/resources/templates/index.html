@@ -119,19 +119,19 @@
               v-loading="loading"
               empty-text="未查询到流程模型！">
         <!-- 序号 -->
-        <el-table-column type="index" label="序号" align="center" width="80%"></el-table-column>
+        <el-table-column type="index" label="序号" align="center" width="60"></el-table-column>
         <!-- 流程名称 -->
-        <el-table-column prop="name" label="流程名称" width="230"></el-table-column>
-        <!-- 新增头像图片列 -->
+        <el-table-column prop="name" label="流程名称" width="180"></el-table-column>
+        <!-- 流程定义Key -->
         <el-table-column prop="key" label="流程定义Key" width="180"></el-table-column>
         <!-- 版本 -->
-        <el-table-column prop="version" label="部署版本" align="center" width="100"></el-table-column>
+        <el-table-column prop="version" label="部署版本" align="center" width="90"></el-table-column>
         <!-- 发布状态 -->
-        <el-table-column prop="publishStatus" label="发布状态" align="center" width="140"></el-table-column>
+        <el-table-column prop="publishStatus" label="发布状态" align="center" width="100"></el-table-column>
         <!-- 流程描述 -->
-        <el-table-column prop="description" label="流程描述" width="290"></el-table-column>
+        <el-table-column prop="description" label="流程描述" width="210"></el-table-column>
         <!-- 创建时间 -->
-        <el-table-column prop="createTime" label="创建时间" align="center" width="190"></el-table-column>
+        <el-table-column prop="createTime" label="创建时间" align="center" width="180"></el-table-column>
         <!-- 操做列 -->
         <el-table-column fixed="right" align="center" label="操作">
             <template #default="scope">
@@ -190,7 +190,7 @@
     </el-dialog>
     <!-- 新增模型弹框 -->
     <el-dialog class="new_bpmn_model" v-model="createModelDialog" title="流程基本信息" width="35%"
-               style="align-content: center;height: 35%;" :before-close="handleDialogBeforeClose">
+               style="align-content: center;height: 50%;" :before-close="handleDialogBeforeClose">
         <!-- :rules="rules"校验规则 -->
         <el-form ref="bpmnFormRef"
                  :model="bpmnForm"
@@ -280,7 +280,9 @@
             </div>
         </template>
         <div>
-            <h1>lucky sheet online operation or preview</h1>
+            <!-- 展示Excel -->
+            <div id="xlsxSheetDialog"
+                 style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div>
         </div>
     </el-dialog>
 </div>
@@ -639,6 +641,7 @@
                     parameter.isXlsxViewExcelDialog = true;
                     console.log("弹框预览：", val.file);
                     // 展示Excel
+
                 }
             };
 
